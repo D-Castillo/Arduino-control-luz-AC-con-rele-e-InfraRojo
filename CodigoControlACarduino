@@ -1,0 +1,43 @@
+#include <IRremote.h>
+
+#define Boton0 0xFF6897
+#define Boton1 0xFF30CF
+#define Boton2 0xFF18E7
+#define Boton3 0xFF7A85
+
+                                        //*int = entero "cifra o nº entero"
+int SensorIR = 11;                      //sentencia int: declaramos/nombramos el pin 11 como "SensorIR"
+int Rele = 8;                           //sentencia int: declaramos/nombramos el pin 8 como "Rele"
+                                     
+IRrecv irrecv(SensorIR);                //Asociamos el receptor o SensorIR
+
+decode_results codigo ;                 //Declaramos/nombramos los resultados (de los codigos emitidos)
+                                        // como "codigo"
+void setup()
+{
+  Serial.begin(9600);                   //Activamos el "monitor serie"
+  // En caso de que el controlador de interrupción se bloquee en la configuración, dará una pista
+  // al usuario de lo que esta sucediendo.
+  Serial.println("Enabling IRin");
+  irrecv.enableIRIn();                  //Se inicia/activa el receptor
+  Serial.println("Enabled IRin");
+
+ 
+  pinMode (Rele, OUTPUT) ;               //Declaramos el pin 8 o "Rele" como salida
+}
+
+void loop() {
+  if (irrecv.decode(&codigo)) {          //Decodifica o "lee" el codigo emitido por el mando/control remoto
+    Serial.println(codigo.value, HEX);   //Imprime el codigo en valor hexadecimal y lo muestra en el "monitor serie"
+
+    if (codigo.value == Boton2){         //Orden condicional: si el codigo recibido corresponde al boton 2
+      digitalWrite(Rele, HIGH) ;}        //Acción: entonces el Rele se activa (en este caso se apaga el punto de luz) 
+      delay(50);                         
+    if (codigo.value == Boton1){         //Orden condicional: si el codigo recibido corresponde al boton 1
+      digitalWrite(Rele, LOW);}          //Acción: entonces el Rele se desactiva (en este caso se enciende el punto de luz)
+      delay(50);
+    
+    irrecv.resume();                     // Recibe el siguiente valor
+  }
+  delay(100);
+}
